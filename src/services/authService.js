@@ -4,8 +4,9 @@ import {
   signOut,
   sendPasswordResetEmail,
   updateProfile,
+  onAuthStateChanged,
 } from "firebase/auth";
-import { doc, setDoc, getDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc, serverTimestamp } from "firebase/firestore";
 import { auth, db } from "../firebase/config";
 
 export const authService = {
@@ -35,8 +36,6 @@ export const authService = {
       throw error;
     }
   },
-
-  // Login
   login: async (email, password) => {
     try {
       const userCredential = await signInWithEmailAndPassword(
@@ -44,20 +43,54 @@ export const authService = {
         email,
         password
       );
+      const user = userCredential.user;
+      const userDocRef = doc(db, "users", user.uid);
+      const userDoc = await getDoc(userDocRef);
 
-      // Get user data from Firestore
-      const userDoc = await getDoc(doc(db, "users", userCredential.user.uid));
+      if (!userDoc.exists()) {
+        throw new Error(
+          "User profile not found. Please contact administrator."
+        );
+      }
+
+      const userData = userDoc.data();
+      if (!userData.isActive) {
+        await signOut(auth);
+        throw new Error(
+          "Your account has been deactivated. Please contact administrator."
+        );
+      }
+      await setDoc(
+        userDocRef,
+        {
+          lastLogin: serverTimestamp(),
+        },
+        { merge: true }
+      );
 
       return {
-        ...userCredential.user,
-        userData: userDoc.data(),
+        user,
+        userData,
       };
     } catch (error) {
-      throw error;
+      switch (error.code) {
+        case "auth/invalid-email":
+          throw new Error("Invalid email address.");
+        case "auth/user-disabled":
+          throw new Error("This account has been disabled.");
+        case "auth/user-not-found":
+          throw new Error("No account found with this email.");
+        case "auth/wrong-password":
+          throw new Error("Incorrect password.");
+        case "auth/too-many-requests":
+          throw new Error("Too many failed attempts. Please try again later.");
+        case "auth/network-request-failed":
+          throw new Error("Network error. Please check your connection.");
+        default:
+          throw error;
+      }
     }
   },
-
-  // Logout
   logout: async () => {
     try {
       await signOut(auth);
@@ -83,5 +116,8 @@ export const authService = {
     } catch (error) {
       throw error;
     }
+  },
+  onAuthStateChange: (callback) => {
+    return onAuthStateChanged(auth, callback);
   },
 };

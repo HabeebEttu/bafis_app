@@ -15,6 +15,7 @@ import { MdOutlineMail } from "react-icons/md";
 import { FaGlobeAsia } from "react-icons/fa";
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import { Link } from 'react-router-dom';
 export default function LandingPage() {
  
   return (
@@ -78,10 +79,11 @@ function Navbar() {
 
         gap={1}
         >
+          <Link to={'/login'}>
           <Button
             variant='outlined'
             size='small'
-          >Sign In</Button>
+          >Sign In</Button></Link>
           <Button
           variant='contained'
           >Get Started</Button>
