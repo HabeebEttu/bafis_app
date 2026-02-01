@@ -16,6 +16,7 @@ import { FaGlobeAsia } from "react-icons/fa";
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { Link } from 'react-router-dom';
+import { Agriculture } from '@mui/icons-material';
 export default function LandingPage() {
  
   return (
@@ -299,7 +300,7 @@ function Footer() {
               borderRadius: 1,
             }}
           >
-            <FaMotorcycle />
+            <Agriculture/>
           </Box>
           <Typography
             textTransform={"uppercase"}

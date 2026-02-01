@@ -11,6 +11,7 @@ import {
   InputAdornment,
   IconButton,
   Alert,
+  CircularProgress,
 } from "@mui/material";
 import {
   Visibility,
@@ -67,7 +68,8 @@ export default function LoginPage() {
                   navigate('/dashboard');
           }
       } catch (error) {
-        setError(error)
+        setError(error.message || String(error));
+        setLoading(false)
       }
   };
 
@@ -152,8 +154,8 @@ export default function LoginPage() {
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",
-                  px: { xs: 3, sm: 6, md: 17, xl: 20 },
-          py:10,
+          px: { xs: 3, sm: 6, md: 17, xl: 20 },
+          py: 10,
           bgcolor: "background.paper",
         }}
       >
@@ -198,11 +200,13 @@ export default function LoginPage() {
             </Typography>
           </Box>
 
-                  {/* Form */}
-                  {error &&(<Alert severity="error" sx={{ mb: 3 }} onClose={()=>setError("")}>
-                      {error}
-                  </Alert>)}
-                  
+          {/* Form */}
+          {error && (
+            <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError("")}>
+              {error}
+            </Alert>
+          )}
+
           <form onSubmit={handleSubmit}>
             <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
               {/* Email Field */}
@@ -228,10 +232,10 @@ export default function LoginPage() {
                         borderColor: "primary.main",
                       },
                     },
-                      fontSize: 15,
-                      "::placeholder": {
-                        fontSize:10
-                    }
+                    fontSize: 15,
+                    "::placeholder": {
+                      fontSize: 10,
+                    },
                   }}
                 />
               </Box>
@@ -326,7 +330,8 @@ export default function LoginPage() {
                 variant="contained"
                 fullWidth
                 size="large"
-                endIcon={<Login />}
+                disabled={loading}
+                endIcon={!loading && <Login />}
                 sx={{
                   py: 1.5,
                   fontSize: "1rem",
@@ -336,7 +341,13 @@ export default function LoginPage() {
                   },
                 }}
               >
-                Sign In
+                {loading ? (
+                  <CircularProgress size={24} color="inherit" />
+                ) : (
+                  <>
+                    Sign In
+                  </>
+                )}
               </Button>
             </Box>
           </form>
