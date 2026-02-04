@@ -1,24 +1,32 @@
-import { alpha, Box, Card, Typography } from '@mui/material'
-import React from 'react'
-import PageHeader from '../../utils/PageHeader';
-import { AddCircle, Download, HealthAndSafety, PriorityHigh, TrendingDown, TrendingUp } from '@mui/icons-material';
+import { alpha, Box, Card, CardContent, MenuItem, TextField, Typography } from "@mui/material";
+import React, { useState } from "react";
+import PageHeader from "../../utils/PageHeader";
+import {
+  AddCircle,
+  Download,
+  HealthAndSafety,
+  PriorityHigh,
+  TrendingDown,
+  TrendingUp,
+} from "@mui/icons-material";
+import { Bar, BarChart, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 export default function TrackMortality() {
   const mortalityCards = [
     {
-      name:'Total Mortality (This Month)',
-      count:532,
-      percentage:5.2,
-      isIncrease:true
+      name: "Total Mortality (This Month)",
+      count: 532,
+      percentage: 5.2,
+      isIncrease: true,
     },
     {
-      name:'Av. Mortality Rate (%)',
-      count:'2.4%',
-      percentage:0.1,
-      isIncrease:false
-    }
-  ]
-  const onClick = null
+      name: "Av. Mortality Rate (%)",
+      count: "2.4%",
+      percentage: 0.1,
+      isIncrease: false,
+    },
+  ];
+  const onClick = null;
   return (
     <Box
       display={"flex"}
@@ -33,7 +41,7 @@ export default function TrackMortality() {
     >
       <PageHeader
         title={"Mortality Tracking"}
-        subtitle={"Real time health mnitoring and loss diagnostics"}
+        subtitle={"Real time health monitoring and loss diagnostics"}
         actions={[
           {
             name: "Export",
@@ -51,24 +59,32 @@ export default function TrackMortality() {
       />
       <Box
         mt={2}
-        width={'100%'}
+        width={"100%"}
         gap={3}
-        sx={{display: "grid",
+        sx={{
+          display: "grid",
           gridTemplateColumns: "repeat(3, 1fr)",
           gap: 3,
           mb: 3,
         }}
       >
-        {
-          mortalityCards.map((item, index) => <MortalityCard name={item.name} count={item.count} percentage={item.percentage} isIncrease={item.isIncrease} key={item}/>)
-        }<CriticalAlertsCard label='active batches' count={8}/>
+        {mortalityCards.map((item, index) => (
+          <MortalityCard
+            name={item.name}
+            count={item.count}
+            percentage={item.percentage}
+            isIncrease={item.isIncrease}
+            key={item}
+          />
+        ))}
+        <CriticalAlertsCard label="active batches" count={8} />
       </Box>
-
+      <MortalityTrendsChart/>
     </Box>
   );
 }
 
-function MortalityCard({name,count,percentage,isIncrease = true}) {
+function MortalityCard({ name, count, percentage, isIncrease = true }) {
   const isPositiveTrend = !isIncrease;
   const trendColor = isPositiveTrend ? "success.main" : "error.main";
   return (
@@ -89,7 +105,6 @@ function MortalityCard({name,count,percentage,isIncrease = true}) {
       }}
     >
       <Box display="flex" alignItems="center" gap={1} width="100%">
-       
         <Typography
           variant="body1"
           fontSize={15}
@@ -154,11 +169,10 @@ function MortalityCard({name,count,percentage,isIncrease = true}) {
   );
 }
 
-
-const CriticalAlertsCard = ({ 
-  count = 8, 
-  label = 'active batches',
-  onClick 
+const CriticalAlertsCard = ({
+  count = 8,
+  label = "active batches",
+  onClick,
 }) => {
   return (
     <Card
@@ -172,43 +186,42 @@ const CriticalAlertsCard = ({
         boxShadow: 0,
         gap: 2,
         borderRadius: 2,
-        position: 'relative',
-        overflow: 'visible',
-        cursor: onClick ? 'pointer' : 'default',
-        transition: 'all 0.3s ease',
-        bgcolor: alpha('#FF6B35', 0.03),
-        borderColor: alpha('#FF6B35', 0.2),
-        '&:hover': {
-          boxShadow: onClick ? '0 4px 12px rgba(255, 107, 53, 0.15)' : 0,
-          borderColor: 'error.main',
-          bgcolor: alpha('#FF6B35', 0.05),
+        position: "relative",
+        overflow: "visible",
+        cursor: onClick ? "pointer" : "default",
+        transition: "all 0.3s ease",
+        bgcolor: alpha("#FF6B35", 0.03),
+        borderColor: alpha("#FF6B35", 0.2),
+        "&:hover": {
+          boxShadow: onClick ? "0 4px 12px rgba(255, 107, 53, 0.15)" : 0,
+          borderColor: "error.main",
+          bgcolor: alpha("#FF6B35", 0.05),
         },
       }}
     >
-      {/* Alert Icon Badge - Top Right */}
       <Box
         sx={{
-          position: 'absolute',
+          position: "absolute",
           top: -10,
           right: -10,
           width: 52,
           height: 52,
-          borderRadius: '50%',
-          bgcolor: 'error.main',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          border: '4px solid',
-          borderColor: 'background.paper',
-          boxShadow: '0 4px 12px rgba(255, 107, 53, 0.3)',
+          borderRadius: "50%",
+          bgcolor: "error.main",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          border: "4px solid",
+          borderColor: "background.paper",
+          boxShadow: "0 4px 12px rgba(255, 107, 53, 0.3)",
         }}
       >
-        <PriorityHigh 
-          sx={{ 
-            fontSize: 28, 
-            color: 'white',
+        <PriorityHigh
+          sx={{
+            fontSize: 28,
+            color: "white",
             fontWeight: 700,
-          }} 
+          }}
         />
       </Box>
 
@@ -218,33 +231,29 @@ const CriticalAlertsCard = ({
         fontSize={15}
         fontWeight={600}
         color="text.secondary"
-        sx={{ textTransform: 'none' }}
+        sx={{ textTransform: "none" }}
       >
         Critical Alerts
       </Typography>
 
       {/* Count and Label */}
-      <Box 
-        display="flex" 
-        alignItems="baseline"
-        gap={1}
-      >
-        <Typography 
+      <Box display="flex" alignItems="baseline" gap={1}>
+        <Typography
           variant="h2"
-          sx={{ 
+          sx={{
             fontWeight: 700,
-            color: 'error.main',
+            color: "error.main",
             lineHeight: 1,
-            fontSize: '2.5rem',
+            fontSize: "2.5rem",
           }}
         >
           {count}
         </Typography>
-        <Typography 
+        <Typography
           variant="body1"
           color="text.secondary"
-          sx={{ 
-            fontSize: '0.95rem',
+          sx={{
+            fontSize: "0.95rem",
             fontWeight: 400,
           }}
         >
@@ -254,3 +263,73 @@ const CriticalAlertsCard = ({
     </Card>
   );
 };
+
+function MortalityTrendsChart() {
+  const [timeRange, setTimeRange] = useState('7')
+  const data = [
+    {
+      name: 'Mon',
+      val:40,
+    },{
+      name: 'Tue',
+      val:45,
+    },{
+      name: 'Wed',
+      val:68,
+    },{
+      name: 'Thu',
+      val:23,
+    },{
+      name: 'Fri',
+      val:93,
+    },{
+      name: 'Sat',
+      val:20,
+    },{
+      name: 'Sun',
+      val:22,
+    }
+  ]
+  return (
+    <Card
+      display={"flex"}
+      flexDirection={"column"}
+      variant="outlined"
+      elevation={1}
+    >
+      <CardContent>
+        <Box
+          display={"flex"}
+          alignItems={"center"}
+          justifyContent={"space-between"}
+        >
+          <Typography color="text.primary" variant="body1">
+            Mortality Trends
+          </Typography>
+          <TextField
+            select
+            value={timeRange}
+            size="small"
+            onChange={(e) => setTimeRange(e.target.value)}
+            variant="outlined"
+          >
+            <MenuItem value={"7"}>This week (last 7 days)</MenuItem>
+            <MenuItem value={"30"}>This week (last 30 days)</MenuItem>
+          </TextField>
+        </Box>
+        <Box mt={8}></Box>
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart data={data} barSize={45}>
+            <XAxis dataKey="name" />
+            <YAxis />
+            <Tooltip />
+            {/* <Legend /> */}
+            <Bar dataKey="val" fill="#2D7A3E" width={12}/>
+          </BarChart>
+        </ResponsiveContainer>
+      </CardContent>
+    </Card>
+
+  );
+}
+ function 
