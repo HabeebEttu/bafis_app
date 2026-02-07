@@ -49,6 +49,7 @@ import AddBirds from "../../components/admin/flock/AddFlock";
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import FlockManagement from "../../components/admin/flock/FlockManagement";
 import TrackMortality from "../../components/admin/flock/mortality/TrackMortality";
+import RecordMortality from "../../components/admin/flock/mortality/RecordMortality";
 export default function AdminDashboard() {
   const [view, setView] = useState("dashboard");
 
@@ -143,8 +144,11 @@ export default function AdminDashboard() {
               }}
             />
           )}
+          {view === "mortality-record" && <RecordMortality />}
           {view === "view_flock_details" && <ViewFlockRecords />}
-          {view === 'mortality' &&<TrackMortality/>}
+          {view === "mortality" && (
+            <TrackMortality navToRecord={() => setView('mortality-record')} />
+          )}
         </Box>
       </Box>
     </Box>
@@ -355,6 +359,10 @@ function Sidebar({ itemsList, view }) {
           view === "add_bird" && item.view === "flock" ? true : isActive;
         isActive =
           view === "view_flock_details" && item.view === "flock"
+            ? true
+            : isActive;
+        isActive =
+          view === "mortality-record" && item.view === "mortality"
             ? true
             : isActive;
         return (
