@@ -50,6 +50,7 @@ import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YA
 import FlockManagement from "../../components/admin/flock/FlockManagement";
 import TrackMortality from "../../components/admin/flock/mortality/TrackMortality";
 import RecordMortality from "../../components/admin/flock/mortality/RecordMortality";
+import FeedConsumptionOverview from "../../components/admin/feed/FeedConsumptionOverview";
 export default function AdminDashboard() {
   const [view, setView] = useState("dashboard");
 
@@ -149,6 +150,7 @@ export default function AdminDashboard() {
           {view === "mortality" && (
             <TrackMortality navToRecord={() => setView('mortality-record')} />
           )}
+          {view === "feed" && <FeedConsumptionOverview/>}
         </Box>
       </Box>
     </Box>
