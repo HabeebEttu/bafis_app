@@ -83,7 +83,6 @@ export default function FeedConsumptionOverview() {
       status: "low stock",
       statusColor: "#9f1239",
     },
-
   ];
   return (
     <Box display={"flex"} flexDirection={"column"} gap={3} px={3} py={4}>
@@ -159,7 +158,8 @@ export default function FeedConsumptionOverview() {
             />
           );
         })}
-        <FeedInventory headers={headers} items={data}/>
+        <FeedInventory headers={headers} items={data} />
+        <RecentConsumption />
       </Box>
     </Box>
   );
@@ -245,7 +245,13 @@ function FeedInventory({ items, headers }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(7);
-
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+  const paginatedData = items.slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage,
+  );
   return (
     <Paper
       elevation={0}
@@ -254,10 +260,12 @@ function FeedInventory({ items, headers }) {
         borderRadius: "15px",
         overflow: "hidden",
         gridColumn: "span 2",
-        gridRow:'span 3'
+        gridRow: "span 3",
+        display: "flex", 
+        flexDirection: "column", 
+        height: "100%", 
       }}
     >
-      {/* Header */}
       <Box
         sx={{
           p: 2,
@@ -265,6 +273,7 @@ function FeedInventory({ items, headers }) {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
+          flexShrink: 0,
         }}
       >
         <Typography
@@ -275,10 +284,10 @@ function FeedInventory({ items, headers }) {
             color: "#212121",
           }}
         >
-          Recent Records
+          Feed Inventory
         </Typography>
         <TextField
-          placeholder="Search batch or cause..."
+          placeholder="Search feed..."
           value={searchQuery}
           onChange={(e) => {
             setSearchQuery(e.target.value);
@@ -309,13 +318,29 @@ function FeedInventory({ items, headers }) {
           }}
         />
       </Box>
-      <InventoryBody data={items} headers={headers} />
-      <Box>
+
+      <Box
+        sx={{
+          flexGrow: 1,
+          overflowY: "auto", 
+          overflowX: "hidden", 
+        }}
+      >
+        <InventoryBody data={paginatedData} headers={headers} />
+      </Box>
+
+      <Box
+        sx={{
+          flexShrink: 0,
+          borderTop: "1px solid #e0e0e0",
+          backgroundColor: "white",
+        }}
+      >
         <CustomPagination
           count={items.length}
           page={page}
           rowsPerPage={rowsPerPage}
-          // onPageChange={() => handleChangePage}
+          onPageChange={handleChangePage} 
         />
       </Box>
     </Paper>
@@ -429,5 +454,134 @@ function InventoryBody({ headers, data }) {
         </TableBody>
       </Table>
     </TableContainer>
+  );
+}
+function RecentConsumption() {
+  const consumptionData = [
+    { date: "Today", batch: "B-2024-001", quantity: "150 kg" },
+    { date: "Yesterday", batch: "B-2024-001", quantity: "148 kg" },
+    { date: "24 Sep", batch: "B-2024-002", quantity: "220 kg" },
+    { date: "23 Sep", batch: "B-2023-098", quantity: "185 kg" },
+  ];
+
+  return (
+    <Paper
+      elevation={0}
+      sx={{
+        border: "1px solid #e0e0e0",
+        borderRadius: "15px",
+        overflow: "hidden",
+        // gridColumn: "span 2",
+        gridRow: "span 3",
+      }}
+    >
+      <Box
+        sx={{
+          p: 2,
+          borderBottom: "1px solid #e0e0e0",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <Typography
+          variant="h6"
+          textTransform={"capitalize"}
+          sx={{
+            fontSize: "16px",
+            fontWeight: 600,
+            color: "#212121",
+          }}
+        >
+          Recent Consumption
+        </Typography>
+      </Box>
+
+      <Box sx={{ p: 2 }}>
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr 1fr",
+            gap: 2,
+            mb: 2,
+          }}
+        >
+          <Typography
+            sx={{
+              fontSize: "11px",
+              fontWeight: 600,
+              color: "#9e9e9e",
+              textTransform: "uppercase",
+            }}
+          >
+            Date
+          </Typography>
+          <Typography
+            sx={{
+              fontSize: "11px",
+              fontWeight: 600,
+              color: "#9e9e9e",
+              textTransform: "uppercase",
+            }}
+          >
+            Batch #
+          </Typography>
+          <Typography
+            sx={{
+              fontSize: "11px",
+              fontWeight: 600,
+              color: "#9e9e9e",
+              textTransform: "uppercase",
+              textAlign: "right",
+            }}
+          >
+            Quantity Used
+          </Typography>
+        </Box>
+
+        {consumptionData.map((item, index) => (
+          <Box
+            key={index}
+            sx={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr 1fr",
+              gap: 2,
+              py: 2,
+              borderBottom:
+                index !== consumptionData.length - 1
+                  ? "1px solid #f5f5f5"
+                  : "none",
+            }}
+          >
+            <Typography
+              sx={{
+                fontSize: "14px",
+                color: "#212121",
+              }}
+            >
+              {item.date}
+            </Typography>
+            <Typography
+              sx={{
+                fontSize: "14px",
+                color: "#212121",
+              }}
+            >
+              {item.batch}
+            </Typography>
+            <Typography
+              sx={{
+                fontSize: "14px",
+                fontWeight: 600,
+                color: "#212121",
+                textAlign: "right",
+              }}
+            >
+              {item.quantity}
+            </Typography>
+          </Box>
+        ))}
+      </Box>
+    </Paper>
   );
 }

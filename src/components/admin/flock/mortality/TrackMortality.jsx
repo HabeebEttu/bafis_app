@@ -45,7 +45,7 @@ import {
 } from "recharts";
 import CustomPagination from "../../../utils/CustomPagination";
 
-export default function TrackMortality({navToRecord}) {
+export default function TrackMortality({ navToRecord }) {
   const mortalityCards = [
     {
       name: "Total Mortality (This Month)",
@@ -436,8 +436,12 @@ const RecentRecords = () => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
-  const filteredData = records.filter((record) =>
-    record.batch.toLowerCase().includes(searchQuery.toLowerCase()) ||  record.date.toLowerCase().includes(searchQuery.toLowerCase()) ||  record.causeOfDeath.toLowerCase().includes(searchQuery.toLowerCase()) || record.staffMember.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredData = records.filter(
+    (record) =>
+      record.batch.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      record.date.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      record.causeOfDeath.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      record.staffMember.toLowerCase().includes(searchQuery.toLowerCase()),
   );
   const paginatedData = filteredData.slice(
     page * rowsPerPage,
@@ -720,9 +724,7 @@ const RecentRecords = () => {
         </TableContainer>
 
         {/* Footer */}
-        <Box
-          
-        >
+        <Box>
           <CustomPagination
             count={records.length}
             page={page}
