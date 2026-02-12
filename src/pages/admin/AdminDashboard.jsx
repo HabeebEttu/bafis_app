@@ -46,11 +46,19 @@ import {
 import React, { useState } from "react";
 import { GiNestBirds } from "react-icons/gi";
 import AddBirds from "../../components/admin/flock/AddFlock";
-import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import {
+  CartesianGrid,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 import FlockManagement from "../../components/admin/flock/FlockManagement";
 import TrackMortality from "../../components/admin/flock/mortality/TrackMortality";
 import RecordMortality from "../../components/admin/flock/mortality/RecordMortality";
-import FeedConsumptionOverview from "../../components/admin/feed/FeedConsumptionOverview";
+import FeedConsumptionOverview, { FeedConsumptionHistory, FeedConsumptionTracker } from "../../components/admin/feed/FeedConsumptionOverview";
 export default function AdminDashboard() {
   const [view, setView] = useState("dashboard");
 
@@ -114,8 +122,8 @@ export default function AdminDashboard() {
         sx={{
           display: "flex",
           flexDirection: "column",
-          flex: 1,
           overflow: "hidden",
+          flex: 1,
           minWidth: 0,
         }}
       >
@@ -148,9 +156,20 @@ export default function AdminDashboard() {
           {view === "mortality-record" && <RecordMortality />}
           {view === "view_flock_details" && <ViewFlockRecords />}
           {view === "mortality" && (
-            <TrackMortality navToRecord={() => setView('mortality-record')} />
+            <TrackMortality navToRecord={() => setView("mortality-record")} />
           )}
-          {view === "feed" && <FeedConsumptionOverview/>}
+          {view === "feed" && (
+            <FeedConsumptionOverview
+              navToConsumptionHistory={() =>
+                setView("feed/consumption_history")
+              }
+              navToRecordConsumption={() => 
+                setView('feed/record_consumption')
+              }
+            />
+          )}
+          {view === "feed/consumption_history" && <FeedConsumptionHistory />}
+          {view === "feed/record_consumption" && <FeedConsumptionTracker/>}
         </Box>
       </Box>
     </Box>
@@ -957,8 +976,6 @@ function WelcomeStatCard({ Icons, title, value, verdict, iconBg, iconColor }) {
   );
 }
 
-
-
 function ViewFlockRecords() {
   const basicInfo = {
     breed: "rhode island red",
@@ -971,12 +988,12 @@ function ViewFlockRecords() {
     "mortality rate": "0.5%",
     "last check": "Today, 8:30pm",
   };
-const data = [
-  { day: "DAY 1", actual: 45, target: 42 },
-  { day: "DAY 4", actual: 68, target: 72 },
-  { day: "DAY 7", actual: 95, target: 105 },
-  { day: "DAY 10", actual: 128, target: 142 },
-  { day: "DAY 14", actual: 165, target: 182 },
+  const data = [
+    { day: "DAY 1", actual: 45, target: 42 },
+    { day: "DAY 4", actual: 68, target: 72 },
+    { day: "DAY 7", actual: 95, target: 105 },
+    { day: "DAY 10", actual: 128, target: 142 },
+    { day: "DAY 14", actual: 165, target: 182 },
   ];
   const activities = [
     {
@@ -1137,7 +1154,7 @@ const data = [
                 dataKey="target"
                 stroke="#059669"
                 activeDot={{ r: 6 }}
-                strokeDasharray={'5 5'}
+                strokeDasharray={"5 5"}
                 type="monotone"
                 name="Target"
                 strokeWidth={2}
@@ -1227,91 +1244,89 @@ const data = [
           </Box>
           <Divider />
           <CardContent>
-            {
-              activities.map((item, index) => {
-                return (
-                  <Box
-                    key={item.id}
-                    sx={{
-                      display: "flex",
-                      gap: 2,
-                      position: "relative",
-                      pb: index !== activities.length - 1 ? 3 : 0,
-                    }}
-                  >
-                    {index !== activities.length - 1 && (
-                      <Box
-                        sx={{
-                          position: "absolute",
-                          left: "3.5px",
-                          top: "17px",
-                          width: "1px",
-                          height: "calc(100% - 20px)",
-                          backgroundColor: "#E5E7EB",
-                          zIndex: 0,
-                        }}
-                      />
-                    )}
+            {activities.map((item, index) => {
+              return (
+                <Box
+                  key={item.id}
+                  sx={{
+                    display: "flex",
+                    gap: 2,
+                    position: "relative",
+                    pb: index !== activities.length - 1 ? 3 : 0,
+                  }}
+                >
+                  {index !== activities.length - 1 && (
                     <Box
                       sx={{
-                        width: 8,
-                        height: 8,
-                        borderRadius: "50%",
-                        bgcolor: item.color,
-                        zIndex: 1,
-                        mt: 0.5,
-                        position: "relative",
-                        flexShrink: 0,
+                        position: "absolute",
+                        left: "3.5px",
+                        top: "17px",
+                        width: "1px",
+                        height: "calc(100% - 20px)",
+                        backgroundColor: "#E5E7EB",
+                        zIndex: 0,
                       }}
-                    ></Box>
-                    <Box sx={{ flex: 1, minWidth: 0 }}>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "flex-start",
-                          gap: 2,
-                        }}
-                      >
-                        <Box sx={{ flex: 1, minWidth: 0 }}>
-                          <Typography
-                            sx={{
-                              fontSize: "0.875rem",
-                              fontWeight: 500,
-                              color: "#1F2937",
-                              mb: 0.5,
-                            }}
-                          >
-                            {item.title}
-                          </Typography>
-                          <Typography
-                            sx={{
-                              fontSize: "0.75rem",
-                              color: "#9CA3AF",
-                            }}
-                          >
-                            {item.description}
-                          </Typography>
-                        </Box>
-
+                    />
+                  )}
+                  <Box
+                    sx={{
+                      width: 8,
+                      height: 8,
+                      borderRadius: "50%",
+                      bgcolor: item.color,
+                      zIndex: 1,
+                      mt: 0.5,
+                      position: "relative",
+                      flexShrink: 0,
+                    }}
+                  ></Box>
+                  <Box sx={{ flex: 1, minWidth: 0 }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "flex-start",
+                        gap: 2,
+                      }}
+                    >
+                      <Box sx={{ flex: 1, minWidth: 0 }}>
+                        <Typography
+                          sx={{
+                            fontSize: "0.875rem",
+                            fontWeight: 500,
+                            color: "#1F2937",
+                            mb: 0.5,
+                          }}
+                        >
+                          {item.title}
+                        </Typography>
                         <Typography
                           sx={{
                             fontSize: "0.75rem",
                             color: "#9CA3AF",
-                            flexShrink: 0, 
-                            whiteSpace: "nowrap",
                           }}
                         >
-                          {item.date}
+                          {item.description}
                         </Typography>
                       </Box>
+
+                      <Typography
+                        sx={{
+                          fontSize: "0.75rem",
+                          color: "#9CA3AF",
+                          flexShrink: 0,
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {item.date}
+                      </Typography>
                     </Box>
                   </Box>
-                );
-              })
-            }
+                </Box>
+              );
+            })}
           </CardContent>
-          </Card>
+        </Card>
       </Box>
     </Box>
   );
