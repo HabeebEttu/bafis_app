@@ -24,6 +24,7 @@ import {
   HealthAndSafetyOutlined,
   HistoryOutlined,
   LocalHospital,
+  EggRounded,
 } from "@mui/icons-material";
 import {
   Avatar,
@@ -43,7 +44,7 @@ import {
   ListItemText,
   LinearProgress,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { GiNestBirds } from "react-icons/gi";
 import AddBirds from "../../components/admin/flock/AddFlock";
 import {
@@ -58,7 +59,13 @@ import {
 import FlockManagement from "../../components/admin/flock/FlockManagement";
 import TrackMortality from "../../components/admin/flock/mortality/TrackMortality";
 import RecordMortality from "../../components/admin/flock/mortality/RecordMortality";
-import FeedConsumptionOverview, { FeedConsumptionHistory, FeedConsumptionTracker } from "../../components/admin/feed/FeedConsumptionOverview";
+import FeedConsumptionOverview, {
+  FeedConsumptionHistory,
+  FeedConsumptionTracker,
+  FeedPurchaseOrder,
+} from "../../components/admin/feed/FeedConsumptionOverview";
+import { flockService } from "../../services/flockService";
+import RecordDailyProduction from "../../components/admin/production/production_record/RecordDailyProduction";
 export default function AdminDashboard() {
   const [view, setView] = useState("dashboard");
 
@@ -91,6 +98,12 @@ export default function AdminDashboard() {
             title: "Feed Management",
             view: "feed",
             onClick: () => setView("feed"),
+          },
+          {
+            Icons: EggRounded,
+            title: 'Egg Production',
+            view:'egg',
+            onClick:()=>setView('egg')
           },
           {
             Icons: MedicalServices,
@@ -163,13 +176,14 @@ export default function AdminDashboard() {
               navToConsumptionHistory={() =>
                 setView("feed/consumption_history")
               }
-              navToRecordConsumption={() => 
-                setView('feed/record_consumption')
-              }
+              navToRecordConsumption={() => setView("feed/record_consumption")}
+              navToPurchaseOrder={() => setView("feed/purchase_order")}
             />
           )}
           {view === "feed/consumption_history" && <FeedConsumptionHistory />}
-          {view === "feed/record_consumption" && <FeedConsumptionTracker/>}
+          {view === "feed/record_consumption" && <FeedConsumptionTracker />}
+          {view === "feed/purchase_order" && <FeedPurchaseOrder />}
+          {view === "egg" && <RecordDailyProduction/>}
         </Box>
       </Box>
     </Box>
@@ -386,6 +400,14 @@ function Sidebar({ itemsList, view }) {
           view === "mortality-record" && item.view === "mortality"
             ? true
             : isActive;
+        isActive =
+          view === "feed/consumption_history" && item.view === "feed"
+            ? true
+            : isActive;
+        isActive =
+          view === "feed/record_consumption" && item.view === "feed"
+            ? true
+            : isActive;
         return (
           <Box
             onClick={item.onClick}
@@ -419,11 +441,32 @@ function Sidebar({ itemsList, view }) {
 }
 
 function DashboardView({ addBird }) {
+  const [flockStats, setFlockStats] = useState({
+        totalFlocks: 0,
+        activeFlocks: 0,
+        totalBirds: 0,
+        averageMortalityRate: 0,
+        flocksByBreed: {},
+        flocksByStatus: {
+          pending: 0,
+          approved: 0,
+          rejected: 0,
+        },
+      });
+  useEffect(() => {
+    async function getFlockStats() {
+      const val = await flockService.getFlockStats();
+      console.log(val)
+      setFlockStats(val);
+    }
+    getFlockStats();
+  },[flockStats]);
+
   const stats = [
     {
       Icons: GiNestBirds,
       title: "Total Birds",
-      value: "12,450",
+      value: flockStats.totalBirds.toLocaleString(),
       verdict: { Icon: TrendingUp, value: "+2.5%", color: "success" },
       iconBg: "#e8f5e9",
       iconColor: "#2E7D32",
@@ -783,7 +826,9 @@ function DashboardView({ addBird }) {
                         display: "flex",
                       }}
                     >
-                      <activity.icon fontSize="small" />
+                      {React.createElement(activity.icon, {
+                        fontSize: "small",
+                      })}
                     </Box>
                   </ListItemIcon>
                   <ListItemText

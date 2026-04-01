@@ -45,6 +45,8 @@ import {
   Monitor,
   OpenInNew,
   Search,
+  Send,
+  SendOutlined,
   Warning,
 } from "@mui/icons-material";
 import CustomPagination from "../../utils/CustomPagination";
@@ -52,6 +54,7 @@ import CustomPagination from "../../utils/CustomPagination";
 export default function FeedConsumptionOverview({
   navToConsumptionHistory,
   navToRecordConsumption,
+  navToPurchaseOrder,
 }) {
   const overviewData = [
     {
@@ -117,7 +120,7 @@ export default function FeedConsumptionOverview({
             variant: "contained",
             Icon: Inventory2,
             name: "Add Stock",
-            value: () => {},
+            value: navToPurchaseOrder,
           },
         ]}
       />
@@ -607,7 +610,6 @@ function RecentConsumption({ navToConsumptionHistory }) {
           </Box>
         ))}
 
-        
         <Box
           sx={{
             display: "flex",
@@ -1113,28 +1115,25 @@ export function FeedConsumptionHistory() {
   );
 }
 
-
-
-// Styled components for exact match
 const StyledToggleButton = styled(ToggleButton)(({ theme }) => ({
-  padding: '8px 16px',
+  padding: "8px 16px",
   borderRadius: 8,
-  border: '1px solid #E5E7EB',
-  backgroundColor: '#F9FAFB',
-  color: '#666666',
-  textTransform: 'none',
+  border: "1px solid #E5E7EB",
+  backgroundColor: "#F9FAFB",
+  color: "#666666",
+  textTransform: "none",
   fontWeight: 500,
-  fontSize: '0.875rem',
-  '&.Mui-selected': {
-    backgroundColor: '#E8F5E9',
-    color: '#2D7A3E',
-    border: '1px solid #E8F5E9',
-    '&:hover': {
-      backgroundColor: '#E8F5E9',
+  fontSize: "0.875rem",
+  "&.Mui-selected": {
+    backgroundColor: "#E8F5E9",
+    color: "#2D7A3E",
+    border: "1px solid #E8F5E9",
+    "&:hover": {
+      backgroundColor: "#E8F5E9",
     },
   },
-  '&:hover': {
-    backgroundColor: '#F3F4F6',
+  "&:hover": {
+    backgroundColor: "#F3F4F6",
   },
 }));
 
@@ -1142,15 +1141,15 @@ const ColorDot = styled(Box)(({ color }) => ({
   width: 32,
   height: 32,
   borderRadius: 4,
-  backgroundColor: color || '#FF6B35',
+  backgroundColor: color || "#FF6B35",
 }));
 
 export function FeedConsumptionTracker() {
-  const [feedType, setFeedType] = useState('');
-  const [batch, setBatch] = useState('Batch #B204-L (2,500 birds)');
-  const [quantity, setQuantity] = useState('0.00');
-  const [timeOfDay, setTimeOfDay] = useState('Morning');
-  const [remarks, setRemarks] = useState('');
+  const [feedType, setFeedType] = useState("");
+  const [batch, setBatch] = useState("Batch #B204-L (2,500 birds)");
+  const [quantity, setQuantity] = useState("0.00");
+  const [timeOfDay, setTimeOfDay] = useState("Morning");
+  const [remarks, setRemarks] = useState("");
 
   const handleTimeChange = (event, newTime) => {
     if (newTime !== null) {
@@ -1378,7 +1377,7 @@ export function FeedConsumptionTracker() {
           {/* Sidebar */}
           <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
             {/* Current Stock Card */}
-            <Card>
+            <Card variant="outlined">
               <Box
                 sx={{
                   p: 2,
@@ -1625,6 +1624,377 @@ export function FeedConsumptionTracker() {
           </Box>
         </Box>
       </Box>
+    </Box>
+  );
+}
+export function FeedPurchaseOrder() {
+  const [formData, setFormData] = useState({
+    supplier: "",
+    quantityRequested: 0,
+    feedType: "",
+    expectedDeliveryDate: "",
+    notes: "",
+  });
+  return (
+    <Box
+      sx={{
+        backgroundColor: "background.default",
+        minHeight: "100vh",
+        py: 4,
+        px: 3,
+      }}
+    >
+      <Box sx={{ maxWidth: 1400, mx: "auto" }}>
+        <PageHeader
+          title={"Create Feed Purchase Order"}
+          subtitle={
+            "Fill out the details below to initiate new replenishment request."
+          }
+        />
+        <Box mb={5} />
+        <Card variant={"outlined"}>
+          <CardContent>
+            <Box
+              display={"grid"}
+              width={"100%"}
+              gridTemplateColumns={"repeat(2 , 1fr)"}
+              columnGap={4}
+              rowGap={3}
+            >
+              <SelectField
+                label={"Select Supplier"}
+                name={"supplier"}
+                placeholder={{
+                  value: "",
+                  text: "Choose a preffered supplier",
+                }}
+                items={[
+                  {
+                    label: "Agro Feed supplier LTD",
+                    value: "agro_feed_supplier",
+                  },
+                ]}
+                value={""}
+                onChange={(e) => {
+                  setFormData((prev) => {
+                    return {
+                      ...prev,
+                      supplier: e.target.value,
+                    };
+                  });
+                }}
+              />
+              <FormField
+                label={"Quantity Requested (Bags)"}
+                placeholder={"0.00"}
+                type={"number"}
+                name={"quantity"}
+                value={formData.quantityRequested}
+                onChange={(e) => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    quantityRequested: e.target.value,
+                  }));
+                }}
+              />
+              <SelectField
+                label={"Feed Type"}
+                name={"feed"}
+                placeholder={{ value: "", text: "Select Feed Type..." }}
+                value={formData.feedType}
+                onChange={(e) => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    feedType: e.target.value,
+                  }));
+                }}
+                items={[]}
+              />
+              <FormField
+                label={"Expected Delivery Date"}
+                name={"deliveryDate"}
+                type={"date"}
+                value={formData.expectedDeliveryDate}
+                onChange={(e) => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    expectedDeliveryDate: e.target.value,
+                  }));
+                }}
+              />
+              <TextAreaField
+                label={"Notes to supplier"}
+                name={"notes"}
+                placeholder={
+                  "Any specific requirements for or batch requirements..."
+                }
+              />
+              <Box gridColumn={"span 2"}>
+                <Paper
+                  variant="outlined"
+                  sx={{
+                    bgcolor: "#f8fafc",
+                    p: 3,
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 1,
+                  }}
+                >
+                  <Box
+                    display={"flex"}
+                    alignItems={"flex-end"}
+                    justifyContent={"space-between"}
+                  >
+                    <Typography
+                      textTransform={"uppercase"}
+                      fontWeight={750}
+                      fontSize={15}
+                    >
+                      Cost estimation
+                    </Typography>
+                  </Box>
+                  <Box
+                    display={"grid"}
+                    gridTemplateColumns={"repeat(2,1fr)"}
+                    columnGap={5}
+                  >
+                    <Box
+                      display={"flex"}
+                      alignItems={"flex-end"}
+                      justifyContent={"space-between"}
+                      borderBottom={0.75}
+                      borderColor={"grey.300"}
+                      pb={1}
+                    >
+                      <Typography textTransform={"capitalize"} fontWeight={600}>
+                        Estimated Unit Price
+                      </Typography>
+                      <Typography fontWeight={800}>₦4050.0/Bag</Typography>
+                    </Box>
+                    <Box
+                      display={"flex"}
+                      alignItems={"flex-end"}
+                      justifyContent={"space-between"}
+                      borderBottom={0.75}
+                      borderColor={"grey.300"}
+                      pb={1}
+                    >
+                      <Typography textTransform={"capitalize"} fontWeight={600}>
+                        Total Estimated Amount
+                      </Typography>
+                      <Typography color={"primary.main"} fontWeight={800}>
+                        ₦0.00
+                      </Typography>
+                    </Box>
+                    <Typography fontStyle={"italic"} fontSize={10}>
+                      *Final prices may vary based on market rates at the time
+                      of dispatch.
+                    </Typography>
+                  </Box>
+                </Paper>
+              </Box>
+            </Box>
+          </CardContent>
+          <Box
+            px={2}
+            py={3}
+            bgcolor={"#f8fafc"}
+            display={"flex"}
+            alignItems={"center"}
+            justifyContent={"space-between"}
+            borderTop={0.6}
+            borderColor={"grey.300"}
+          >
+            <Button variant="text" size="small">
+              {" "}
+              Cancel
+            </Button>
+            <Box
+              display={"flex"}
+              alignItems={"center"}
+              justifyContent={"flex-end"}
+              gap={1}
+            >
+              <Button
+                variant="outlined"
+                size="small"
+                sx={{ textTransform: "capitalize" }}
+              >
+                save as draft
+              </Button>
+              <Button
+                variant="contained"
+                size="small"
+                sx={{ textTransform: "capitalize" }}
+              >
+                <Box
+                  display={"flex"}
+                  flexWrap={"nowrap"}
+                  gap={0.7}
+                  color={"white"}
+                  alignItems={'center'}
+                >
+                  <SendOutlined fontSize="14"/>
+                  <Typography
+                    sx={{ textTransform: "capitalize" }}
+                    color={"white"}
+                    fontSize={14}
+                  >
+                    Submit your approval
+                  </Typography>
+                </Box>
+              </Button>
+            </Box>
+          </Box>
+        </Card>
+      </Box>
+    </Box>
+  );
+}
+function FormField({ label, name, type, placeholder, value, onChange }) {
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        gap: 0.8,
+      }}
+    >
+      <Typography
+        component={"label"}
+        htmlFor={name}
+        textTransform={"capitalize"}
+        fontSize={16}
+        fontWeight={600}
+        color="text.main"
+      >
+        {label}
+      </Typography>
+      <TextField
+        type={type}
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        size="small"
+        sx={{
+          "& input::placeholder": {
+            fontSize: "18px",
+          },
+        }}
+        fullWidth
+      />
+    </Box>
+  );
+}
+
+function SelectField({
+  label,
+  name,
+  placeholder,
+  value,
+  onChange,
+  items = [],
+}) {
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        gap: 0.8,
+      }}
+    >
+      <Typography
+        component={"label"}
+        htmlFor={name}
+        textTransform={"capitalize"}
+        fontSize={16}
+        fontWeight={600}
+        color="text.main"
+      >
+        {label}
+      </Typography>
+      <TextField
+        select
+        value={value || ""}
+        onChange={onChange}
+        defaultValue={""}
+        size="small"
+        sx={{
+          "& input::placeholder": {
+            fontSize: "18px",
+          },
+        }}
+        fullWidth
+        SelectProps={{
+          displayEmpty: true,
+          renderValue: (selected) => {
+            if (selected === placeholder.value || selected === "") {
+              return (
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1.5,
+                  }}
+                >
+                  <Typography fontSize={14} color="text.primary">
+                    {placeholder.text}
+                  </Typography>
+                </Box>
+              );
+            }
+            return (
+              <Typography fontSize={14} color="text.primary">
+                {selected}
+              </Typography>
+            );
+          },
+        }}
+      >
+        {items.map((item, _) => {
+          return <MenuItem value={item.value}>{item.label}</MenuItem>;
+        })}
+      </TextField>
+    </Box>
+  );
+}
+function TextAreaField({ label, name, placeholder, value, onChange }) {
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        gap: 0.8,
+        gridColumn: "span 2",
+        gridRow: "span 2",
+      }}
+    >
+      <Typography
+        component={"label"}
+        htmlFor={name}
+        textTransform={"capitalize"}
+        fontSize={16}
+        fontWeight={600}
+        color="text.main"
+      >
+        {label}
+      </Typography>
+      <TextField
+        multiline
+        minRows={3}
+        maxRows={6}
+        value={value || ""}
+        onChange={onChange}
+        defaultValue={""}
+        placeholder={placeholder}
+        size="small"
+        sx={{
+          "& input::placeholder": {
+            fontSize: "18px",
+          },
+        }}
+        fullWidth
+      ></TextField>
     </Box>
   );
 }

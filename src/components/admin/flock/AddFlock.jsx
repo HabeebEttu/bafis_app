@@ -171,14 +171,14 @@ export default function AddBirds({ onCancel }) {
   setSubmitError("");
 
   try {
-    // let imageUrl = null;
+    let imageUrl = null;
 
-    // if (selectedFile) {
-    //   const timestamp = Date.now();
-    //   const fileName = `${timestamp}_${selectedFile.name}`;
-    //   const path = `flocks/${fileName}`;
-    //   imageUrl = await storageService.uploadFile(selectedFile, path);
-    // }
+    if (selectedFile) {
+      const timestamp = Date.now();
+      const fileName = `${timestamp}_${selectedFile.name}`;
+      const path = `flocks/${fileName}`;
+      imageUrl = await storageService.uploadFile(selectedFile, path);
+    }
 
     const flockData = {
       batchNumber: formData.batchNumber.trim(),
@@ -190,7 +190,7 @@ export default function AddBirds({ onCancel }) {
       ageInWeeks: formData.age,
       healthStatus: formData.healthStatus,
       notes: formData.notes.trim(),
-      // imageUrl: imageUrl,
+      imageUrl: imageUrl,
       submittedBy: currentUser.id,// TODO: Get from auth context
     };
 

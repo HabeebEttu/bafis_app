@@ -215,7 +215,7 @@ export const flockService = {
       const flocks = querySnapshot.docs.map((doc) => doc.data());
 
       const stats = {
-        totalFlocks: flocks.length,
+        totalFlocks: flocks.length || 0,
         activeFlocks: flocks.filter((f) => f.isActive).length,
         totalBirds: flocks.reduce((sum, f) => sum + (f.quantity || 0), 0),
         averageMortalityRate: (
