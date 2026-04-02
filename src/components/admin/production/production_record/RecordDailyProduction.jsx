@@ -2,9 +2,16 @@ import {
   Alert,
   alpha,
   Box,
+  Button,
   Chip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   IconButton,
   InputAdornment,
+  Menu,
+  MenuItem,
   Paper,
   Table,
   TableBody,
@@ -18,11 +25,14 @@ import {
 import PageHeader from "../../utils/PageHeader";
 import {
   AddCircle,
+  Delete,
+  Edit,
   InfoOutlined,
   MoreVert,
   Search,
   StackedLineChart,
   Verified,
+  Visibility,
   Warning,
 } from "@mui/icons-material";
 import CustomPagination from "../../../utils/CustomPagination";
@@ -192,8 +202,11 @@ const RecentEggCollections = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchQuery, setSearchQuery] = useState("");
-  const records = [
+  const [menuAnchor, setMenuAnchor] = useState(null)
+  const [selectedRecord,setSelectedRecord] = useState(null)
+  const [records,setRecords] =useState ([
     {
+      id: 1,
       date: 'Oct 23, 2023',
       time: '10:30 AM',
       batch: 'B-204',
@@ -204,7 +217,7 @@ const RecentEggCollections = () => {
       },
       staffMember: 'John Doe'
     }
-  ];
+  ]);
   const headers = [
     "date/time",
     "batch",
@@ -216,16 +229,85 @@ const RecentEggCollections = () => {
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
+  const [openEditDialog, setOpenEditDialog] = useState(false)
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
+  const [editFormData, setEditFormData] = useState({
+    batch: "",
+    regularEggs: "",
+    crackedEggs: "",
+    staffMember: "",
+  });
+  const handleMenuOpen = (event,record) => {
+    event.stopPropagation()
+    setMenuAnchor(event.currentTarget)
+    setSelectedRecord(record)
+  }
+  const handleMenuClose = () => {
+    setMenuAnchor(null)
+  }
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
+  const handleEditAction = () => {
+    setEditFormData({
+      batch: selectedRecord.batch,
+      regularEggs: selectedRecord.eggs.regular.toString(),
+      crackedEggs: selectedRecord.eggs.cracked.toString(),
+      staffMember: selectedRecord.staffMember,
+    });
+    setOpenEditDialog(true);
+    handleMenuClose();
+  }
+  const handleDeleteClick = () => {
+    setOpenDeleteDialog(true);
+    handleMenuClose();
+  };
+  const handleConfirmDelete = () => {
+    if (!selectedRecord) {
+      console.error("No record selected for deletion");
+      setOpenDeleteDialog(false);
+      return;
+    }
+  const updatedRecords = records.filter(
+    (record) => record.id !== selectedRecord.id
+  );
+  setRecords(updatedRecords);
+  setSelectedRecord(null)
+  setOpenDeleteDialog(false);
+  };
+  const handleSaveEdit = () => {
+    const updatedRecords = records.map((record) => {
+      if(record.id === selectedRecord.id){
+        return {
+          ...record,
+          batch: editFormData.batch,
+          eggs: {
+            regular: parseInt(editFormData.regularEggs) || 0,
+            cracked: parseInt(editFormData.crackedEggs) || 0,
+          },
+          staffMember: editFormData.staffMember,
+          quantity:
+            (parseInt(editFormData.regularEggs) || 0) +
+            (parseInt(editFormData.crackedEggs) || 0),
+        }
+      }
+      return record
+    })
+    setOpenDeleteDialog(false);
+    setRecords(updatedRecords)
+    setEditFormData({
+      batch: '',
+      regularEggs: 0,
+      crackedEgs: 0,
+      staffMember:''
+    })
+  }
   const filteredData = records.filter(
     (record) =>
       record.batch.toLowerCase().includes(searchQuery.toLowerCase()) ||
       record.date.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      record.causeOfDeath.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      record.staffMember.toLowerCase().includes(searchQuery.toLowerCase()) || {},
+      record.staffMember.toLowerCase().includes(searchQuery.toLowerCase()),
   );
   const paginatedData = filteredData.slice(
     page * rowsPerPage,
@@ -323,6 +405,7 @@ const RecentEggCollections = () => {
             </TableHead>
             <TableBody>
               {paginatedData.map((record, index) => (
+                <>
                 <TableRow
                   key={index}
                   sx={{
@@ -389,20 +472,80 @@ const RecentEggCollections = () => {
                       textAlign: "center",
                     }}
                   >
-                    <IconButton size="small" sx={{ color: "#9e9e9e" }}>
+                    <IconButton size="small" sx={{ color: "#9e9e9e" }} onClick={(event) => {
+                      handleMenuOpen(event,record)
+                    }}>
                       <MoreVert sx={{ fontSize: "20px" }} />
                     </IconButton>
+                    <Menu
+                      anchorEl={menuAnchor}
+                      open={Boolean(menuAnchor && selectedRecord?.id === record.id)}
+                      onClose={handleMenuClose}
+                    >
+                      
+                      <MenuItem onClick={handleEditAction}>
+                        <Edit sx={{ mr: 1 }} />
+                        Edit
+                      </MenuItem>
+                      <MenuItem onClick={handleDeleteClick} sx={{ color: "error.main" }}>
+                        <Delete sx={{ mr: 1 }} />
+                        Delete
+                      </MenuItem>
+                    </Menu>
                   </TableCell>
                 </TableRow>
+                <Dialog open={openEditDialog} onClose={() => setOpenEditDialog(false)}>
+  <DialogTitle>Edit Record - {selectedRecord?.batch}</DialogTitle>
+  <DialogContent>
+    <TextField
+      label="Batch ID"
+      value={editFormData.batch}
+      onChange={(e) => setEditFormData({ ...editFormData, batch: e.target.value })}
+    />
+    <TextField
+      label="Regular Eggs"
+      type="number"
+      value={editFormData.regularEggs}
+      onChange={(e) => setEditFormData({ ...editFormData, regularEggs: e.target.value })}
+    />
+    <TextField
+      label="Cracked Eggs"
+      type="number"
+      value={editFormData.crackedEggs}
+      onChange={(e) => setEditFormData({ ...editFormData, crackedEggs: e.target.value })}
+    />
+    <TextField
+      label="Staff Member"
+      value={editFormData.staffMember}
+      onChange={(e) => setEditFormData({ ...editFormData, staffMember: e.target.value })}
+    />
+  </DialogContent>
+  <DialogActions>
+    <Button onClick={() => setOpenEditDialog(false)}>Cancel</Button>
+    <Button onClick={handleSaveEdit} variant="contained">Save</Button>
+  </DialogActions>
+</Dialog>
+ 
+<Dialog open={openDeleteDialog} onClose={() => setOpenDeleteDialog(false)}>
+  <DialogTitle>Delete Record?</DialogTitle>
+  <DialogContent>
+    Are you sure you want to delete batch {selectedRecord?.batch}?
+  </DialogContent>
+  <DialogActions>
+    <Button onClick={() => setOpenDeleteDialog(false)}>Cancel</Button>
+    <Button onClick={handleConfirmDelete} color="error" variant="contained">
+      Delete
+    </Button>
+  </DialogActions>
+                  </Dialog></>
               ))}
             </TableBody>
           </Table>
         </TableContainer>
 
-        {/* Footer */}
         <Box>
           <CustomPagination
-            count={records.length}
+            count={filteredData.length}
             page={page}
             rowsPerPage={rowsPerPage}
             onPageChange={() => handleChangePage}
