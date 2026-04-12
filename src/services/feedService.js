@@ -15,7 +15,6 @@ import {
 import { db } from "../firebase/config";
 
 export const feedService = {
-  // Feed Inventory Management
   createFeedInventory: async (inventoryData) => {
     try {
       const docRef = await addDoc(collection(db, "feedInventory"), {

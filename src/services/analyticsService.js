@@ -125,7 +125,6 @@ export const analyticsService = {
         totalConsumption / consumption.length
       ).toFixed(2);
 
-      // Group by date for trend
       const trend = {};
       consumption.forEach((c) => {
         const date = new Date(c.recordedAt.toDate()).toISOString().split("T")[0];
@@ -147,7 +146,6 @@ export const analyticsService = {
     }
   },
 
-  // Get mortality trend for a flock
   getMortalityTrendAnalytics: async (flockId, days = 30) => {
     try {
       const summary = await mortalityService.getDailyMortalitySummary(

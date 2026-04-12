@@ -66,6 +66,7 @@ import FeedConsumptionOverview, {
 } from "../../components/admin/feed/FeedConsumptionOverview";
 import { flockService } from "../../services/flockService";
 import RecordDailyProduction from "../../components/admin/production/production_record/RecordDailyProduction";
+import EggCollectionForm from "../../components/admin/production/production_record/RecordCollection";
 export default function AdminDashboard() {
   const [view, setView] = useState("dashboard");
 
@@ -102,8 +103,8 @@ export default function AdminDashboard() {
           {
             Icons: EggRounded,
             title: 'Egg Production',
-            view:'egg',
-            onClick:()=>setView('egg')
+            view: 'egg',
+            onClick: () => setView('egg')
           },
           {
             Icons: MedicalServices,
@@ -183,7 +184,8 @@ export default function AdminDashboard() {
           {view === "feed/consumption_history" && <FeedConsumptionHistory />}
           {view === "feed/record_consumption" && <FeedConsumptionTracker />}
           {view === "feed/purchase_order" && <FeedPurchaseOrder />}
-          {view === "egg" && <RecordDailyProduction/>}
+          {view === "egg" && <RecordDailyProduction navToCollectionForm={() => setView("egg/record")} />}
+          {view === "egg/record" && <EggCollectionForm />}
         </Box>
       </Box>
     </Box>
@@ -408,6 +410,11 @@ function Sidebar({ itemsList, view }) {
           view === "feed/record_consumption" && item.view === "feed"
             ? true
             : isActive;
+        isActive =
+          view === "egg/record" && item.view === "egg"
+            ? true
+            : isActive;
+
         return (
           <Box
             onClick={item.onClick}
@@ -442,17 +449,17 @@ function Sidebar({ itemsList, view }) {
 
 function DashboardView({ addBird }) {
   const [flockStats, setFlockStats] = useState({
-        totalFlocks: 0,
-        activeFlocks: 0,
-        totalBirds: 0,
-        averageMortalityRate: 0,
-        flocksByBreed: {},
-        flocksByStatus: {
-          pending: 0,
-          approved: 0,
-          rejected: 0,
-        },
-      });
+    totalFlocks: 0,
+    activeFlocks: 0,
+    totalBirds: 0,
+    averageMortalityRate: 0,
+    flocksByBreed: {},
+    flocksByStatus: {
+      pending: 0,
+      approved: 0,
+      rejected: 0,
+    },
+  });
   useEffect(() => {
     async function getFlockStats() {
       const val = await flockService.getFlockStats();
@@ -460,7 +467,7 @@ function DashboardView({ addBird }) {
       setFlockStats(val);
     }
     getFlockStats();
-  },[flockStats]);
+  }, [flockStats]);
 
   const stats = [
     {
@@ -979,7 +986,7 @@ function WelcomeStatCard({ Icons, title, value, verdict, iconBg, iconColor }) {
             label={verdict.value}
             {...(verdict.Icon && {
               deleteIcon: <verdict.Icon />,
-              onDelete: () => {},
+              onDelete: () => { },
             })}
             size="small"
             sx={{

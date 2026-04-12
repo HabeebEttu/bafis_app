@@ -8,6 +8,7 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  Fade,
   IconButton,
   InputAdornment,
   Menu,
@@ -38,7 +39,7 @@ import {
 import CustomPagination from "../../../utils/CustomPagination";
 import { useState } from "react";
 
-export default function RecordDailyProduction() {
+export default function RecordDailyProduction({ navToCollectionForm }) {
   const productionOverview = [
     {
       title: "total Eggs Today.",
@@ -84,7 +85,7 @@ export default function RecordDailyProduction() {
           actions={[
             {
               variant: "contained",
-              value: () => { },
+              value: navToCollectionForm,
               Icon: AddCircle,
               name: "Record New Collection",
             },
@@ -202,21 +203,21 @@ const RecentEggCollections = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchQuery, setSearchQuery] = useState("");
-  const [menuAnchor, setMenuAnchor] = useState(null)
-  const [selectedRecord,setSelectedRecord] = useState(null)
-  const [records,setRecords] =useState ([
+  const [menuAnchor, setMenuAnchor] = useState(null);
+  const [selectedRecord, setSelectedRecord] = useState(null);
+  const [records, setRecords] = useState([
     {
       id: 1,
-      date: 'Oct 23, 2023',
-      time: '10:30 AM',
-      batch: 'B-204',
+      date: "Oct 23, 2023",
+      time: "10:30 AM",
+      batch: "B-204",
       quantity: 1200,
       eggs: {
         regular: 1150,
-        cracked: 10
+        cracked: 10,
       },
-      staffMember: 'John Doe'
-    }
+      staffMember: "John Doe",
+    },
   ]);
   const headers = [
     "date/time",
@@ -229,22 +230,22 @@ const RecentEggCollections = () => {
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
-  const [openEditDialog, setOpenEditDialog] = useState(false)
-  const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
+  const [openEditDialog, setOpenEditDialog] = useState(false);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [editFormData, setEditFormData] = useState({
     batch: "",
     regularEggs: "",
     crackedEggs: "",
     staffMember: "",
   });
-  const handleMenuOpen = (event,record) => {
-    event.stopPropagation()
-    setMenuAnchor(event.currentTarget)
-    setSelectedRecord(record)
-  }
+  const handleMenuOpen = (event, record) => {
+    event.stopPropagation();
+    setMenuAnchor(event.currentTarget);
+    setSelectedRecord(record);
+  };
   const handleMenuClose = () => {
-    setMenuAnchor(null)
-  }
+    setMenuAnchor(null);
+  };
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
@@ -258,7 +259,7 @@ const RecentEggCollections = () => {
     });
     setOpenEditDialog(true);
     handleMenuClose();
-  }
+  };
   const handleDeleteClick = () => {
     setOpenDeleteDialog(true);
     handleMenuClose();
@@ -269,16 +270,16 @@ const RecentEggCollections = () => {
       setOpenDeleteDialog(false);
       return;
     }
-  const updatedRecords = records.filter(
-    (record) => record.id !== selectedRecord.id
-  );
-  setRecords(updatedRecords);
-  setSelectedRecord(null)
-  setOpenDeleteDialog(false);
+    const updatedRecords = records.filter(
+      (record) => record.id !== selectedRecord.id,
+    );
+    setRecords(updatedRecords);
+    setSelectedRecord(null);
+    setOpenDeleteDialog(false);
   };
   const handleSaveEdit = () => {
     const updatedRecords = records.map((record) => {
-      if(record.id === selectedRecord.id){
+      if (record.id === selectedRecord.id) {
         return {
           ...record,
           batch: editFormData.batch,
@@ -290,19 +291,19 @@ const RecentEggCollections = () => {
           quantity:
             (parseInt(editFormData.regularEggs) || 0) +
             (parseInt(editFormData.crackedEggs) || 0),
-        }
+        };
       }
-      return record
-    })
+      return record;
+    });
     setOpenDeleteDialog(false);
-    setRecords(updatedRecords)
+    setRecords(updatedRecords);
     setEditFormData({
-      batch: '',
+      batch: "",
       regularEggs: 0,
       crackedEgs: 0,
-      staffMember:''
-    })
-  }
+      staffMember: "",
+    });
+  };
   const filteredData = records.filter(
     (record) =>
       record.batch.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -377,11 +378,13 @@ const RecentEggCollections = () => {
           />
         </Box>
 
-        <TableContainer sx={{ width: '100%', overflow: 'auto' }}>
-          <Table sx={{
-            minWidth: 650,
-            width: '100%',
-          }}>
+        <TableContainer sx={{ width: "100%", overflow: "auto" }}>
+          <Table
+            sx={{
+              minWidth: 650,
+              width: "100%",
+            }}
+          >
             <TableHead>
               <TableRow sx={{ bgcolor: "#fafafa" }}>
                 {headers.map((item) => (
@@ -400,144 +403,264 @@ const RecentEggCollections = () => {
                     {item}
                   </TableCell>
                 ))}
-                
               </TableRow>
             </TableHead>
             <TableBody>
               {paginatedData.map((record, index) => (
                 <>
-                <TableRow
-                  key={index}
-                  sx={{
-                    "&:hover": {
-                      bgcolor: "#f5f5f5",
-                    },
-                  }}
-                >
-                  <TableCell
+                  <TableRow
+                    key={index}
                     sx={{
-                      fontSize: "14px",
-                      color: "#212121",
-                      borderBottom: "1px solid #e0e0e0",
-                      padding: "16px",
+                      "&:hover": {
+                        bgcolor: "#f5f5f5",
+                      },
                     }}
                   >
-                    {record.date}
-                  </TableCell>
-                  <TableCell
-                    sx={{
-                      fontSize: "14px",
-                      color: "#212121",
-                      fontWeight: 500,
-                      borderBottom: "1px solid #e0e0e0",
-                      padding: "16px",
-                    }}
-                  >
-                    {record.batch}
-                  </TableCell>
-                  <TableCell
-                    sx={{
-                      fontSize: "14px",
-                      color: record.qty >= 10 ? "#d32f2f" : "#212121",
-                      fontWeight: 500,
-                      borderBottom: "1px solid #e0e0e0",
-                      padding: "16px",
-                    }}
-                  >
-                    {record?.eggs?.regular}
-                  </TableCell>
-                  <TableCell
-                    sx={{
-                      borderBottom: "1px solid #e0e0e0",
-                      padding: "16px",
-                    }}
-                  >
-                    {record?.eggs?.cracked}
-                  </TableCell>
-                  <TableCell
-                    sx={{
-                      fontSize: "14px",
-                      color: "#212121",
-                      borderBottom: "1px solid #e0e0e0",
-                      padding: "16px",
-                    }}
-                  >
-                    {record.staffMember}
-                  </TableCell>
-
-                  <TableCell
-                    sx={{
-                      borderBottom: "1px solid #e0e0e0",
-                      padding: "8px",
-                      textAlign: "center",
-                    }}
-                  >
-                    <IconButton size="small" sx={{ color: "#9e9e9e" }} onClick={(event) => {
-                      handleMenuOpen(event,record)
-                    }}>
-                      <MoreVert sx={{ fontSize: "20px" }} />
-                    </IconButton>
-                    <Menu
-                      anchorEl={menuAnchor}
-                      open={Boolean(menuAnchor && selectedRecord?.id === record.id)}
-                      onClose={handleMenuClose}
+                    <TableCell
+                      sx={{
+                        fontSize: "14px",
+                        color: "#212121",
+                        borderBottom: "1px solid #e0e0e0",
+                        padding: "16px",
+                      }}
                     >
-                      
-                      <MenuItem onClick={handleEditAction}>
-                        <Edit sx={{ mr: 1 }} />
-                        Edit
-                      </MenuItem>
-                      <MenuItem onClick={handleDeleteClick} sx={{ color: "error.main" }}>
-                        <Delete sx={{ mr: 1 }} />
+                      {record.date}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        fontSize: "14px",
+                        color: "#212121",
+                        fontWeight: 500,
+                        borderBottom: "1px solid #e0e0e0",
+                        padding: "16px",
+                      }}
+                    >
+                      {record.batch}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        fontSize: "14px",
+                        color: record.qty >= 10 ? "#d32f2f" : "#212121",
+                        fontWeight: 500,
+                        borderBottom: "1px solid #e0e0e0",
+                        padding: "16px",
+                      }}
+                    >
+                      {record?.eggs?.regular}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        borderBottom: "1px solid #e0e0e0",
+                        padding: "16px",
+                      }}
+                    >
+                      {record?.eggs?.cracked}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        fontSize: "14px",
+                        color: "#212121",
+                        borderBottom: "1px solid #e0e0e0",
+                        padding: "16px",
+                      }}
+                    >
+                      {record.staffMember}
+                    </TableCell>
+
+                    <TableCell
+                      sx={{
+                        borderBottom: "1px solid #e0e0e0",
+                        padding: "8px",
+                        textAlign: "center",
+                      }}
+                    >
+                      <IconButton
+                        size="small"
+                        sx={{ color: "#9e9e9e" }}
+                        onClick={(event) => {
+                          handleMenuOpen(event, record);
+                        }}
+                      >
+                        <MoreVert sx={{ fontSize: "20px" }} />
+                      </IconButton>
+                      <Menu
+                        anchorEl={menuAnchor}
+                        open={Boolean(
+                          menuAnchor && selectedRecord?.id === record.id,
+                        )}
+                        onClose={handleMenuClose}
+                        anchorOrigin={{
+                          vertical: "bottom",
+                          horizontal: "right",
+                        }}
+                        transformOrigin={{
+                          vertical: "top",
+                          horizontal: "right",
+                        }}
+                        TransitionComponent={Fade}
+                        transitionDuration={{
+                          enter: 150,
+                          exit:200
+                        }}
+                        slotProps={{
+                          paper: {
+                            elevation: 8,
+                            sx: {
+                              marginTop: "8px", 
+                              padding: "8px 0",
+                              minWidth:'180px',
+                              borderRadius: "10px",
+                              overflow: "visible",
+                              boxShadow: "0 4px 16px rgba(0, 0, 0, 0.12)",
+                              border: `1px solid #e0e0e0`,
+                              bgcolor:'white'
+                            },
+                          },
+                        }}
+                      >
+                        <MenuItem
+                          onClick={handleEditAction}
+                          sx={{
+                            padding: "12px 16px",
+                            minHeight: "44px",
+                            gap: "12px",
+                            display: "flex",
+                            alignItems: "center",
+                            transform: "all 0.2 ",
+                            "&:hover": {
+                              backgroundColor: "#f5f5f5",
+                              paddingLeft: "20px",
+                              transform: "translateX(4px)",
+                            },
+                            
+                            fontSize: "14px",
+                            fontWeight: 500,
+                            color: "#212121",
+                          }}
+                        >
+                          <Edit sx={{ mr: 3 }} fontSize="small" />
+                          Edit
+                        </MenuItem>
+                        <MenuItem
+                          onClick={handleDeleteClick}
+                          sx={{
+                            color: "#d32f2f",
+                            padding: "12px 16px",
+                            minHeight: "44px",
+                            gap: "12px",
+                            display: "flex",
+                            alignItems: "center",
+                            transform: "all 0.2 ",
+                            "&:hover": {
+                              backgroundColor: "#ffebee",
+                              paddingLeft: "20px",
+                            },
+                            "&:focus": {
+                              outline: "0.75px solid #2e7d32",
+                              outlineOffset: "-2px",
+                            },
+                            fontSize: "14px",
+                            fontWeight: 500,
+                          }}
+                        >
+                          <Delete sx={{ mr: 1 }} />
+                          Delete
+                        </MenuItem>
+                      </Menu>
+                    </TableCell>
+                  </TableRow>
+                  <Dialog
+                    open={openEditDialog}
+                    onClose={() => setOpenEditDialog(false)}
+                  >
+                    <DialogTitle>
+                      Edit Record - {selectedRecord?.batch}
+                    </DialogTitle>
+                    <DialogContent>
+                      <Box sx={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(2,1fr)',
+                        rowGap: 1,
+                        columnGap: 1,
+                        overflowY: 'scroll',
+                        py:1
+                      }}>
+                      <TextField
+                        label="Batch ID"
+                        value={editFormData.batch}
+                        onChange={(e) =>
+                          setEditFormData({
+                            ...editFormData,
+                            batch: e.target.value,
+                          })
+                        }
+                      />
+                      <TextField
+                        label="Regular Eggs"
+                        type="number"
+                        value={editFormData.regularEggs}
+                        onChange={(e) =>
+                          setEditFormData({
+                            ...editFormData,
+                            regularEggs: e.target.value,
+                          })
+                        }
+                      />
+                      <TextField
+                        label="Cracked Eggs"
+                        type="number"
+                        value={editFormData.crackedEggs}
+                        onChange={(e) =>
+                          setEditFormData({
+                            ...editFormData,
+                            crackedEggs: e.target.value,
+                          })
+                        }
+                      />
+                      <TextField
+                        label="Staff Member"
+                        value={editFormData.staffMember}
+                        onChange={(e) =>
+                          setEditFormData({
+                            ...editFormData,
+                            staffMember: e.target.value,
+                          })
+                        }
+                      />
+                      </Box></DialogContent>
+                    <DialogActions>
+                      <Button onClick={() => setOpenEditDialog(false)}>
+                        Cancel
+                      </Button>
+                      <Button onClick={handleSaveEdit} variant="contained">
+                        Save
+                      </Button>
+                    </DialogActions>
+                  </Dialog>
+
+                  <Dialog
+                    open={openDeleteDialog}
+                    onClose={() => setOpenDeleteDialog(false)}
+                  >
+                    <DialogTitle>Delete Record?</DialogTitle>
+                    <DialogContent>
+                      Are you sure you want to delete batch{" "}
+                      {selectedRecord?.batch}?
+                    </DialogContent>
+                    <DialogActions>
+                      <Button onClick={() => setOpenDeleteDialog(false)}>
+                        Cancel
+                      </Button>
+                      <Button
+                        onClick={handleConfirmDelete}
+                        color="error"
+                        variant="contained"
+                      >
                         Delete
-                      </MenuItem>
-                    </Menu>
-                  </TableCell>
-                </TableRow>
-                <Dialog open={openEditDialog} onClose={() => setOpenEditDialog(false)}>
-  <DialogTitle>Edit Record - {selectedRecord?.batch}</DialogTitle>
-  <DialogContent>
-    <TextField
-      label="Batch ID"
-      value={editFormData.batch}
-      onChange={(e) => setEditFormData({ ...editFormData, batch: e.target.value })}
-    />
-    <TextField
-      label="Regular Eggs"
-      type="number"
-      value={editFormData.regularEggs}
-      onChange={(e) => setEditFormData({ ...editFormData, regularEggs: e.target.value })}
-    />
-    <TextField
-      label="Cracked Eggs"
-      type="number"
-      value={editFormData.crackedEggs}
-      onChange={(e) => setEditFormData({ ...editFormData, crackedEggs: e.target.value })}
-    />
-    <TextField
-      label="Staff Member"
-      value={editFormData.staffMember}
-      onChange={(e) => setEditFormData({ ...editFormData, staffMember: e.target.value })}
-    />
-  </DialogContent>
-  <DialogActions>
-    <Button onClick={() => setOpenEditDialog(false)}>Cancel</Button>
-    <Button onClick={handleSaveEdit} variant="contained">Save</Button>
-  </DialogActions>
-</Dialog>
- 
-<Dialog open={openDeleteDialog} onClose={() => setOpenDeleteDialog(false)}>
-  <DialogTitle>Delete Record?</DialogTitle>
-  <DialogContent>
-    Are you sure you want to delete batch {selectedRecord?.batch}?
-  </DialogContent>
-  <DialogActions>
-    <Button onClick={() => setOpenDeleteDialog(false)}>Cancel</Button>
-    <Button onClick={handleConfirmDelete} color="error" variant="contained">
-      Delete
-    </Button>
-  </DialogActions>
-                  </Dialog></>
+                      </Button>
+                    </DialogActions>
+                  </Dialog>
+                </>
               ))}
             </TableBody>
           </Table>
